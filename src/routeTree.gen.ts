@@ -9,8 +9,56 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as RecommendationsRouteImport } from './routes/recommendations'
+import { Route as LifecycleRouteImport } from './routes/lifecycle'
+import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as InventoryRouteImport } from './routes/inventory'
+import { Route as GrafanaRouteImport } from './routes/grafana'
+import { Route as CompatibilityRouteImport } from './routes/compatibility'
+import { Route as ClustersRouteImport } from './routes/clusters'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecommendationsRoute = RecommendationsRouteImport.update({
+  id: '/recommendations',
+  path: '/recommendations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LifecycleRoute = LifecycleRouteImport.update({
+  id: '/lifecycle',
+  path: '/lifecycle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GrafanaRoute = GrafanaRouteImport.update({
+  id: '/grafana',
+  path: '/grafana',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompatibilityRoute = CompatibilityRouteImport.update({
+  id: '/compatibility',
+  path: '/compatibility',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClustersRoute = ClustersRouteImport.update({
+  id: '/clusters',
+  path: '/clusters',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +67,144 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/clusters': typeof ClustersRoute
+  '/compatibility': typeof CompatibilityRoute
+  '/grafana': typeof GrafanaRoute
+  '/inventory': typeof InventoryRoute
+  '/jobs': typeof JobsRoute
+  '/lifecycle': typeof LifecycleRoute
+  '/recommendations': typeof RecommendationsRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/clusters': typeof ClustersRoute
+  '/compatibility': typeof CompatibilityRoute
+  '/grafana': typeof GrafanaRoute
+  '/inventory': typeof InventoryRoute
+  '/jobs': typeof JobsRoute
+  '/lifecycle': typeof LifecycleRoute
+  '/recommendations': typeof RecommendationsRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/clusters': typeof ClustersRoute
+  '/compatibility': typeof CompatibilityRoute
+  '/grafana': typeof GrafanaRoute
+  '/inventory': typeof InventoryRoute
+  '/jobs': typeof JobsRoute
+  '/lifecycle': typeof LifecycleRoute
+  '/recommendations': typeof RecommendationsRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/clusters'
+    | '/compatibility'
+    | '/grafana'
+    | '/inventory'
+    | '/jobs'
+    | '/lifecycle'
+    | '/recommendations'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/clusters'
+    | '/compatibility'
+    | '/grafana'
+    | '/inventory'
+    | '/jobs'
+    | '/lifecycle'
+    | '/recommendations'
+    | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/clusters'
+    | '/compatibility'
+    | '/grafana'
+    | '/inventory'
+    | '/jobs'
+    | '/lifecycle'
+    | '/recommendations'
+    | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ClustersRoute: typeof ClustersRoute
+  CompatibilityRoute: typeof CompatibilityRoute
+  GrafanaRoute: typeof GrafanaRoute
+  InventoryRoute: typeof InventoryRoute
+  JobsRoute: typeof JobsRoute
+  LifecycleRoute: typeof LifecycleRoute
+  RecommendationsRoute: typeof RecommendationsRoute
+  SettingsRoute: typeof SettingsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recommendations': {
+      id: '/recommendations'
+      path: '/recommendations'
+      fullPath: '/recommendations'
+      preLoaderRoute: typeof RecommendationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lifecycle': {
+      id: '/lifecycle'
+      path: '/lifecycle'
+      fullPath: '/lifecycle'
+      preLoaderRoute: typeof LifecycleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/grafana': {
+      id: '/grafana'
+      path: '/grafana'
+      fullPath: '/grafana'
+      preLoaderRoute: typeof GrafanaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compatibility': {
+      id: '/compatibility'
+      path: '/compatibility'
+      fullPath: '/compatibility'
+      preLoaderRoute: typeof CompatibilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clusters': {
+      id: '/clusters'
+      path: '/clusters'
+      fullPath: '/clusters'
+      preLoaderRoute: typeof ClustersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +217,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ClustersRoute: ClustersRoute,
+  CompatibilityRoute: CompatibilityRoute,
+  GrafanaRoute: GrafanaRoute,
+  InventoryRoute: InventoryRoute,
+  JobsRoute: JobsRoute,
+  LifecycleRoute: LifecycleRoute,
+  RecommendationsRoute: RecommendationsRoute,
+  SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
