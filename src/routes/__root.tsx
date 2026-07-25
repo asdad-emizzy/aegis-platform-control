@@ -8,9 +8,13 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Search, Bell, Command } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { Separator } from "@/components/ui/separator";
 
 function NotFoundComponent() {
   return (
@@ -48,7 +52,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           This page didn't load
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Something went wrong. You can try again or head back home.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -77,19 +81,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Aegis — Platform Lifecycle Control Plane" },
+      {
+        name: "description",
+        content:
+          "Aegis is an enterprise control plane for platform inventory, lifecycle, and compatibility across EKS fleets, integrated with Prometheus and Grafana.",
+      },
+      { property: "og:title", content: "Aegis — Platform Lifecycle Control Plane" },
+      {
+        property: "og:description",
+        content:
+          "Manage platform inventory, lifecycle, and compatibility across your EKS fleet.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -102,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
       </head>
@@ -114,13 +125,49 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function TopBar() {
+  return (
+    <header className="sticky top-0 z-30 flex h-12 items-center gap-3 border-b border-border/60 bg-background/80 px-3 backdrop-blur">
+      <SidebarTrigger />
+      <Separator orientation="vertical" className="h-5" />
+      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <span className="rounded bg-muted/60 px-1.5 py-0.5 font-medium text-foreground">
+          production
+        </span>
+        <span>/</span>
+        <span>fleet</span>
+      </nav>
+      <div className="ml-auto flex items-center gap-2">
+        <button className="hidden items-center gap-2 rounded-md border border-border bg-card/60 px-2.5 py-1 text-xs text-muted-foreground hover:bg-card md:inline-flex">
+          <Search className="h-3.5 w-3.5" />
+          <span>Search clusters, jobs…</span>
+          <span className="ml-6 inline-flex items-center gap-1 rounded border border-border bg-background px-1 py-0.5 font-mono text-[10px]">
+            <Command className="h-2.5 w-2.5" /> K
+          </span>
+        </button>
+        <button className="relative rounded-md border border-border bg-card/60 p-1.5 text-muted-foreground hover:text-foreground">
+          <Bell className="h-3.5 w-3.5" />
+          <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[color:var(--color-warning)]" />
+        </button>
+      </div>
+    </header>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <SidebarProvider>
+        <AppSidebar />
+        <div className="flex min-h-screen w-full flex-1 flex-col bg-background">
+          <TopBar />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+        </div>
+      </SidebarProvider>
     </QueryClientProvider>
   );
 }
