@@ -19,6 +19,7 @@ import {
   events,
   platformVersionDistribution,
 } from "@/lib/mock-data";
+import { ActiveIncidents } from "@/components/active-incidents";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -83,9 +84,9 @@ function Dashboard() {
   return (
     <>
       <PageHeader
-        kicker="Overview"
-        title="Fleet Dashboard"
-        description="Health, lifecycle status and recent activity across every managed cluster."
+        kicker="Operational Command Center"
+        title="OCC Overview"
+        description="Environment health, active issues, and recent operational activity."
         actions={
           <>
             <Button variant="outline" size="sm">
@@ -102,7 +103,12 @@ function Dashboard() {
 
       <div className="p-6 space-y-6">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <KpiCard icon={Server} label="Total clusters" value={String(total)} hint="Across 3 AWS accounts" />
+          <KpiCard
+            icon={Server}
+            label="Total clusters"
+            value={String(total)}
+            hint="Across 3 AWS accounts"
+          />
           <KpiCard
             icon={Activity}
             label="Healthy"
@@ -138,7 +144,10 @@ function Dashboard() {
             </div>
             <div className="p-4 space-y-3">
               {platformVersionDistribution.map((v) => (
-                <div key={v.version} className="grid grid-cols-[9rem_1fr_2.5rem] items-center gap-3">
+                <div
+                  key={v.version}
+                  className="grid grid-cols-[9rem_1fr_2.5rem] items-center gap-3"
+                >
                   <div className="font-mono text-xs text-muted-foreground">{v.version}</div>
                   <div className="h-2 overflow-hidden rounded-full bg-muted">
                     <div
@@ -146,7 +155,9 @@ function Dashboard() {
                       style={{ width: `${(v.clusters / maxVersion) * 100}%` }}
                     />
                   </div>
-                  <div className="text-right text-xs tabular-nums text-foreground">{v.clusters}</div>
+                  <div className="text-right text-xs tabular-nums text-foreground">
+                    {v.clusters}
+                  </div>
                 </div>
               ))}
             </div>
@@ -159,25 +170,28 @@ function Dashboard() {
               <p className="text-xs text-muted-foreground">Current stage per cluster</p>
             </div>
             <div className="grid grid-cols-2 gap-2 p-4">
-              {(["track", "create", "upgrade", "validate", "migrate", "retire"] as const).map((stage) => {
-                const count = clusters.filter((c) => c.lifecycle === stage).length;
-                return (
-                  <div
-                    key={stage}
-                    className="rounded-md border border-border/60 bg-background/40 px-3 py-2"
-                  >
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      {stage}
+              {(["track", "create", "upgrade", "validate", "migrate", "retire"] as const).map(
+                (stage) => {
+                  const count = clusters.filter((c) => c.lifecycle === stage).length;
+                  return (
+                    <div
+                      key={stage}
+                      className="rounded-md border border-border/60 bg-background/40 px-3 py-2"
+                    >
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {stage}
+                      </div>
+                      <div className="mt-1 text-lg font-semibold tabular-nums">{count}</div>
                     </div>
-                    <div className="mt-1 text-lg font-semibold tabular-nums">{count}</div>
-                  </div>
-                );
-              })}
+                  );
+                },
+              )}
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <ActiveIncidents />
           {/* Recommendations */}
           <div className="rounded-lg border border-border/70 bg-card/60 lg:col-span-2">
             <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
@@ -185,7 +199,10 @@ function Dashboard() {
                 <Sparkles className="h-4 w-4 text-primary" />
                 <h3 className="text-sm font-semibold">Latest recommendations</h3>
               </div>
-              <Link to="/recommendations" className="text-xs text-muted-foreground hover:text-foreground">
+              <Link
+                to="/recommendations"
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
                 View all →
               </Link>
             </div>
@@ -197,10 +214,10 @@ function Dashboard() {
                       r.severity === "critical"
                         ? "danger"
                         : r.severity === "high"
-                        ? "warning"
-                        : r.severity === "medium"
-                        ? "info"
-                        : "muted"
+                          ? "warning"
+                          : r.severity === "medium"
+                            ? "info"
+                            : "muted"
                     }
                   >
                     {r.severity}
@@ -221,7 +238,7 @@ function Dashboard() {
             <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
               <div className="flex items-center gap-2">
                 <CircleDot className="h-4 w-4 text-[color:var(--color-info)]" />
-                <h3 className="text-sm font-semibold">Recent platform events</h3>
+                <h3 className="text-sm font-semibold">Recent operational activity</h3>
               </div>
             </div>
             <ol className="relative px-4 py-3">
@@ -251,7 +268,7 @@ function Dashboard() {
           <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
             <div className="flex items-center gap-2">
               <Workflow className="h-4 w-4 text-primary" />
-              <h3 className="text-sm font-semibold">Automation job status</h3>
+              <h3 className="text-sm font-semibold">Automation activity</h3>
             </div>
             <Link to="/jobs" className="text-xs text-muted-foreground hover:text-foreground">
               View all →
@@ -275,7 +292,9 @@ function Dashboard() {
                       <div className="font-medium">{j.name}</div>
                       <div className="font-mono text-[11px] text-muted-foreground">{j.id}</div>
                     </td>
-                    <td className="px-4 py-2 font-mono text-xs text-muted-foreground">{j.target}</td>
+                    <td className="px-4 py-2 font-mono text-xs text-muted-foreground">
+                      {j.target}
+                    </td>
                     <td className="px-4 py-2">
                       <StatusBadge tone={statusTone(j.status)}>{j.status}</StatusBadge>
                     </td>

@@ -25,14 +25,14 @@ import {
 } from "@/components/ui/sidebar";
 
 const nav = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Inventory", url: "/inventory", icon: Boxes },
-  { title: "Clusters", url: "/clusters", icon: Server },
+  { title: "Overview", url: "/", icon: LayoutDashboard },
+  { title: "Services", url: "/inventory", icon: Boxes },
+  { title: "Infrastructure", url: "/clusters", icon: Server },
   { title: "Platform Lifecycle", url: "/lifecycle", icon: GitBranch },
   { title: "Compatibility", url: "/compatibility", icon: ShieldCheck },
-  { title: "Automation Jobs", url: "/jobs", icon: Workflow },
-  { title: "Recommendations", url: "/recommendations", icon: Sparkles },
-  { title: "Grafana", url: "/grafana", icon: BarChart3 },
+  { title: "Automations", url: "/jobs", icon: Workflow },
+  { title: "Decision Support", url: "/recommendations", icon: Sparkles },
+  { title: "Observability", url: "/grafana", icon: BarChart3 },
 ];
 
 export function AppSidebar() {

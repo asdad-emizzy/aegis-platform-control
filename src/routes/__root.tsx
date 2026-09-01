@@ -9,6 +9,14 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Search, Bell, Command } from "lucide-react";
+import { EnvironmentProvider, useEnvironment, ENVIRONMENTS } from "../lib/environment";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -90,8 +98,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Aegis — Platform Lifecycle Control Plane" },
       {
         property: "og:description",
-        content:
-          "Manage platform inventory, lifecycle, and compatibility across your EKS fleet.",
+        content: "Manage platform inventory, lifecycle, and compatibility across your EKS fleet.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -125,15 +132,31 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function EnvironmentSwitcher() {
+  const { environment, setEnvironment } = useEnvironment();
+  return (
+    <Select value={environment} onValueChange={(v) => setEnvironment(v as typeof environment)}>
+      <SelectTrigger className="h-6 w-auto gap-1 rounded bg-muted/60 px-1.5 py-0.5 text-xs font-medium text-foreground border-none shadow-none">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {ENVIRONMENTS.map((env) => (
+          <SelectItem key={env.value} value={env.value}>
+            {env.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
 function TopBar() {
   return (
     <header className="sticky top-0 z-30 flex h-12 items-center gap-3 border-b border-border/60 bg-background/80 px-3 backdrop-blur">
       <SidebarTrigger />
       <Separator orientation="vertical" className="h-5" />
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <span className="rounded bg-muted/60 px-1.5 py-0.5 font-medium text-foreground">
-          production
-        </span>
+        <EnvironmentSwitcher />
         <span>/</span>
         <span>fleet</span>
       </nav>
@@ -159,15 +182,17 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SidebarProvider>
-        <AppSidebar />
-        <div className="flex min-h-screen w-full flex-1 flex-col bg-background">
-          <TopBar />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-        </div>
-      </SidebarProvider>
+      <EnvironmentProvider>
+        <SidebarProvider>
+          <AppSidebar />
+          <div className="flex min-h-screen w-full flex-1 flex-col bg-background">
+            <TopBar />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+          </div>
+        </SidebarProvider>
+      </EnvironmentProvider>
     </QueryClientProvider>
   );
 }
