@@ -73,3 +73,7 @@ HolmesGPT, Hindsight, Agent Orchestrator, Recommendation, real telemetry/provide
 ## Freeze Criteria
 
 Slice 8 is frozen after the reported source changes are committed and independently reconciled with the canonical architecture and ADR-0006.
+
+## Verification Update (Slice 9)
+
+As part of Slice 9 regression validation, the Slice 8 implementation was confirmed present and functioning directly against the committed `main` branch (TypeScript, build, and UI validation, including the Findings card and empty state on `INC-1024` / `INC-1018`). Slice 8 is now independently verified; the repository-state condition above is resolved.

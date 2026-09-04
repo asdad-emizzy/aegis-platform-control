@@ -15,6 +15,16 @@ import {
   type Finding,
   type FindingClassification,
 } from "@/lib/investigations";
+import {
+  getRecommendationsForInvestigation,
+  type Recommendation,
+  type RecommendationPriority,
+} from "@/lib/investigation-recommendations";
+import {
+  getControlledActionsForInvestigation,
+  type ControlledAction,
+  type ControlledActionStatus,
+} from "@/lib/controlled-actions";
 
 const EVIDENCE_ICONS: Record<EvidenceKind, React.ComponentType<{ className?: string }>> = {
   metric: Gauge,
@@ -28,6 +38,18 @@ const FINDING_CLASSIFICATION_TONE: Record<FindingClassification, "danger" | "war
   "root-cause": "danger",
   "contributing-factor": "warning",
   observation: "info",
+};
+
+const RECOMMENDATION_PRIORITY_TONE: Record<RecommendationPriority, "danger" | "warning" | "info"> = {
+  high: "danger",
+  medium: "warning",
+  low: "info",
+};
+
+const CONTROLLED_ACTION_STATUS_TONE: Record<ControlledActionStatus, "warning" | "success" | "danger"> = {
+  proposed: "warning",
+  authorized: "success",
+  "authorization-denied": "danger",
 };
 
 const LIFECYCLE_STAGES: IncidentStatus[] = ["detected", "triaged", "investigating", "resolved"];
@@ -92,6 +114,12 @@ function IncidentWorkspace() {
     : [];
   const investigationFindings = investigation
     ? getFindingsForInvestigation(investigation.id)
+    : [];
+  const investigationRecommendations = investigation
+    ? getRecommendationsForInvestigation(investigation.id)
+    : [];
+  const investigationControlledActions = investigation
+    ? getControlledActionsForInvestigation(investigation.id)
     : [];
 
   return (
@@ -273,8 +301,135 @@ function IncidentWorkspace() {
             )}
           </div>
         )}
+
+        {investigation && (
+          <div className="rounded-lg border border-border/70 bg-card/60">
+            <div className="border-b border-border/60 px-4 py-3">
+              <h3 className="text-sm font-semibold">Recommendations</h3>
+              <p className="text-xs text-muted-foreground">
+                Proposed operational decisions based on the findings above
+              </p>
+            </div>
+            {investigationRecommendations.length === 0 ? (
+              <p className="px-4 py-3 text-xs text-muted-foreground">
+                No recommendations have been produced for this investigation yet.
+              </p>
+            ) : (
+              <ul className="divide-y divide-border/60">
+                {investigationRecommendations.map((rec) => (
+                  <RecommendationItem
+                    key={rec.id}
+                    recommendation={rec}
+                    findings={investigationFindings}
+                  />
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {investigation && (
+          <div className="rounded-lg border border-border/70 bg-card/60">
+            <div className="border-b border-border/60 px-4 py-3">
+              <h3 className="text-sm font-semibold">Controlled Actions</h3>
+              <p className="text-xs text-muted-foreground">
+                Proposed operations and their authorization state — read-only
+              </p>
+            </div>
+            {investigationControlledActions.length === 0 ? (
+              <p className="px-4 py-3 text-xs text-muted-foreground">
+                No controlled actions have been proposed for this investigation yet.
+              </p>
+            ) : (
+              <ul className="divide-y divide-border/60">
+                {investigationControlledActions.map((action) => (
+                  <ControlledActionItem key={action.id} action={action} />
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
       </div>
     </>
+  );
+}
+
+function ControlledActionItem({ action }: { action: ControlledAction }) {
+  return (
+    <li className="px-4 py-3">
+      <div className="flex items-center gap-2">
+        <StatusBadge tone={CONTROLLED_ACTION_STATUS_TONE[action.status]}>{action.status}</StatusBadge>
+        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+          {action.environment}
+        </span>
+      </div>
+      <p className="mt-1.5 text-sm font-medium">
+        {action.actionType} — {action.targetResource}
+      </p>
+      <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground">
+        {action.recommendationId && (
+          <>
+            <span>From:</span>
+            <span className="rounded-full border border-border/70 bg-background/40 px-1.5 py-0.5">
+              {action.recommendationId}
+            </span>
+          </>
+        )}
+        {action.status === "authorized" && action.authorizedBy && (
+          <span>
+            Authorized by {action.authorizedBy}
+            {action.decidedAt ? ` at ${action.decidedAt}` : ""}
+          </span>
+        )}
+        {action.status === "authorization-denied" && (
+          <span>
+            Denied{action.authorizedBy ? ` by ${action.authorizedBy}` : ""}
+            {action.decidedAt ? ` at ${action.decidedAt}` : ""}
+            {action.denialReason ? ` — ${action.denialReason}` : ""}
+          </span>
+        )}
+      </div>
+    </li>
+  );
+}
+
+function RecommendationItem({
+  recommendation,
+  findings,
+}: {
+  recommendation: Recommendation;
+  findings: { id: string }[];
+}) {
+  const relatedFindingIds = recommendation.findingIds.filter((id) =>
+    findings.some((f) => f.id === id),
+  );
+
+  return (
+    <li className="px-4 py-3">
+      <div className="flex items-center gap-2">
+        <StatusBadge tone={RECOMMENDATION_PRIORITY_TONE[recommendation.priority]}>
+          {recommendation.priority} priority
+        </StatusBadge>
+        <StatusBadge tone="muted" dot={false}>
+          {recommendation.status}
+        </StatusBadge>
+      </div>
+      <p className="mt-1.5 text-sm font-medium">{recommendation.statement}</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">{recommendation.rationale}</p>
+      {relatedFindingIds.length > 0 && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground">
+          <span>Based on:</span>
+          {relatedFindingIds.map((id) => (
+            <span
+              key={id}
+              className="rounded-full border border-border/70 bg-background/40 px-1.5 py-0.5"
+            >
+              {id}
+            </span>
+          ))}
+        </div>
+      )}
+    </li>
   );
 }
 
