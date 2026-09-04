@@ -1,0 +1,111 @@
+# ASSF Lifecycle
+
+The Adaptive Solution Strategy Framework (ASSF) defines the lifecycle that every solution follows before implementation begins.
+
+The lifecycle ensures that strategy drives architecture, architecture drives design, and design drives implementation.
+
+---
+
+## Phase 1 — Strategy
+
+Business Vision
+
+↓
+
+Business Capability
+
+↓
+
+Solution Classification
+
+↓
+
+Strategy Domains
+
+↓
+
+Architecture Strategy
+
+↓
+
+Architecture Strategy Review (ASR)
+
+---
+
+## Phase 2 — Architecture
+
+Architecture Style Selection
+
+↓
+
+Domain Model
+
+↓
+
+Context Map
+
+↓
+
+Component Model
+
+↓
+
+Technology Strategy
+
+---
+
+## Phase 3 — Delivery
+
+Sprint Planning
+
+↓
+
+Sprint
+
+↓
+
+Sprint Review
+
+↓
+
+Sprint Retrospective
+
+↓
+
+Release
+
+---
+
+## Phase 4 — Operations
+
+Production
+
+↓
+
+Operational Feedback
+
+↓
+
+Knowledge Base
+
+↓
+
+Evidence
+
+---
+
+## Phase 5 — Evolution
+
+Evidence Validation
+
+↓
+
+Pattern
+
+↓
+
+Principle
+
+↓
+
+ASSF Evolution
