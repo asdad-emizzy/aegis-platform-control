@@ -32,3 +32,13 @@ export const incidents: Incident[] = [
   { id: "INC-1021", title: "Payments batch failure", environment: "prod", severity: "high", status: "triaged", impact: "Settlement batch behind schedule", affectedServices: ["s2"], detectedAt: "07:15" },
   { id: "INC-1018", title: "Notifications degraded in UAT", environment: "uat", severity: "medium", status: "detected", impact: "Notification delivery delayed", affectedServices: ["s4"], detectedAt: "Yesterday 18:20" },
 ];
+
+export function getIncidentById(id: string): Incident | undefined {
+  return incidents.find((i) => i.id === id);
+}
+
+export function getServicesForIncident(incident: Incident): Service[] {
+  return incident.affectedServices
+    .map((serviceId) => services.find((s) => s.id === serviceId))
+    .filter((s): s is Service => Boolean(s));
+}

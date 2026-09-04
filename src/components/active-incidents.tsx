@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { StatusBadge, statusTone } from "@/components/status-badge";
 import { incidents, services } from "@/lib/incidents";
 
@@ -29,8 +30,16 @@ export function ActiveIncidents() {
             {sorted.map((inc) => {
               const svc = services.find((s) => s.id === inc.affectedServices[0]);
               return (
-                <tr key={inc.id} className="border-b last:border-0">
-                  <td className="px-3 py-2 font-medium">{inc.id}</td>
+                <tr key={inc.id} className="border-b last:border-0 hover:bg-muted/40">
+                  <td className="px-3 py-2 font-medium">
+                    <Link
+                      to="/incidents/$incidentId"
+                      params={{ incidentId: inc.id }}
+                      className="hover:underline"
+                    >
+                      {inc.id}
+                    </Link>
+                  </td>
                   <td className="px-3 py-2 uppercase">{inc.environment}</td>
                   <td className="px-3 py-2">
                     <StatusBadge tone={statusTone(inc.severity)}>{inc.severity}</StatusBadge>

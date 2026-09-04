@@ -51,7 +51,10 @@ export function statusTone(s: string): Tone {
     case "incompatible":
       return "danger";
     case "running":
+    case "active":
       return "info";
+    case "completed":
+      return "success";
     default:
       return "muted";
   }

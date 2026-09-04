@@ -18,6 +18,7 @@ import { Route as GrafanaRouteImport } from './routes/grafana'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as ClustersRouteImport } from './routes/clusters'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as IncidentsIncidentIdRouteImport } from './routes/incidents/$incidentId'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -64,6 +65,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IncidentsIncidentIdRoute = IncidentsIncidentIdRouteImport.update({
+  id: '/incidents/$incidentId',
+  path: '/incidents/$incidentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/lifecycle': typeof LifecycleRoute
   '/recommendations': typeof RecommendationsRoute
   '/settings': typeof SettingsRoute
+  '/incidents/$incidentId': typeof IncidentsIncidentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/lifecycle': typeof LifecycleRoute
   '/recommendations': typeof RecommendationsRoute
   '/settings': typeof SettingsRoute
+  '/incidents/$incidentId': typeof IncidentsIncidentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/lifecycle': typeof LifecycleRoute
   '/recommendations': typeof RecommendationsRoute
   '/settings': typeof SettingsRoute
+  '/incidents/$incidentId': typeof IncidentsIncidentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/lifecycle'
     | '/recommendations'
     | '/settings'
+    | '/incidents/$incidentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/lifecycle'
     | '/recommendations'
     | '/settings'
+    | '/incidents/$incidentId'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/lifecycle'
     | '/recommendations'
     | '/settings'
+    | '/incidents/$incidentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   LifecycleRoute: typeof LifecycleRoute
   RecommendationsRoute: typeof RecommendationsRoute
   SettingsRoute: typeof SettingsRoute
+  IncidentsIncidentIdRoute: typeof IncidentsIncidentIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/incidents/$incidentId': {
+      id: '/incidents/$incidentId'
+      path: '/incidents/$incidentId'
+      fullPath: '/incidents/$incidentId'
+      preLoaderRoute: typeof IncidentsIncidentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   LifecycleRoute: LifecycleRoute,
   RecommendationsRoute: RecommendationsRoute,
   SettingsRoute: SettingsRoute,
+  IncidentsIncidentIdRoute: IncidentsIncidentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

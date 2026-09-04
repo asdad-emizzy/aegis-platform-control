@@ -47,12 +47,13 @@ export function getInvestigationForIncident(incidentId: string): Investigation |
 }
 
 /**
- * Investigation Context / Evidence Foundation (Slice 7). See ADR-0005.
+ * Investigation Context / Evidence Foundation (Slice 7). See ADR-0005
+ * (as corrected by ADR-0006).
  *
  * Evidence is a raw/contextual operational signal referenced by an
- * Investigation — it is NOT a conclusion (that is a future "Finding",
- * owned by the Recommendations domain per DOMAIN_MODEL.md) and it is NOT
- * a replacement for Observability's "Observation". Evidence is
+ * Investigation — it is NOT a conclusion (that is "Finding", owned by
+ * the Investigation domain itself per ADR-0006) and it is NOT a
+ * replacement for Observability's "Observation". Evidence is
  * provider-independent: `kind` describes the category of signal, not a
  * specific telemetry/AI provider payload shape.
  */
@@ -96,4 +97,89 @@ export const evidence: Evidence[] = [
 
 export function getEvidenceForInvestigation(investigationId: string): Evidence[] {
   return evidence.filter((e) => e.investigationId === investigationId);
+}
+
+/**
+ * Finding Foundation (Slice 8). See ADR-0006.
+ *
+ * A Finding is an investigative conclusion — "what do we believe
+ * happened, based on the available evidence?". Finding belongs to the
+ * Investigation domain (NOT Recommendations — ADR-0006 corrects the
+ * earlier ADR-0005 language). A Finding references Evidence by stable
+ * ID; it never duplicates Evidence content. Root Cause is not a
+ * separate domain/type — it is the "root-cause" classification below.
+ * Finding is NOT a Recommendation: it describes a conclusion, never a
+ * proposed operational action.
+ */
+export type FindingClassification = "root-cause" | "contributing-factor" | "observation";
+
+export interface Finding {
+  id: string;
+  investigationId: string;
+  classification: FindingClassification;
+  statement: string;
+  /** 0–1 confidence that the statement is correct, given the referenced evidence. */
+  confidence: number;
+  /** Evidence IDs that support this finding. References only — never duplicated. */
+  supportingEvidenceIds: string[];
+  createdAt: string;
+}
+
+export const findings: Finding[] = [
+  {
+    id: "FND-4001",
+    investigationId: "INV-2001",
+    classification: "root-cause",
+    statement:
+      "The latency spike was introduced by the recent deployment to Order API replicas 2, 4, and 5; configuration was not a factor.",
+    confidence: 0.82,
+    supportingEvidenceIds: ["EVD-3002", "EVD-3001", "EVD-3003"],
+    createdAt: "08:55",
+  },
+];
+
+export function getFindingsForInvestigation(investigationId: string): Finding[] {
+  return findings.filter((f) => f.investigationId === investigationId);
+}
+
+/**
+ * Investigation Provider Contract (Slice 8). See ADR-0006 / PROVIDER_MODEL.md.
+ *
+ * InvestigationProvider is an Aegis-owned outbound port for investigation
+ * execution. It is provider-independent by design: the request/result
+ * shapes below use only Aegis Evidence/Finding concepts and must never
+ * expose vendor-specific payloads, job IDs, or SDK types (e.g. HolmesGPT).
+ * A concrete adapter (e.g. a future HolmesGPT adapter) would translate
+ * its vendor schema into this shape — no such adapter exists in this slice.
+ */
+export interface InvestigationRequest {
+  investigationId: string;
+  incidentId: string;
+  evidence: Evidence[];
+}
+
+export interface InvestigationResult {
+  investigationId: string;
+  findings: Finding[];
+}
+
+export interface InvestigationProvider {
+  investigate(request: InvestigationRequest): Promise<InvestigationResult>;
+}
+
+/**
+ * Deterministic mock implementation of InvestigationProvider.
+ *
+ * Exists only to prove the contract is implementable without coupling to
+ * any external system: no network calls, no LLM calls, no vendor SDKs.
+ * It looks up existing Slice 7/8 mock Findings for the given investigation
+ * rather than fabricating new data.
+ */
+export class MockInvestigationProvider implements InvestigationProvider {
+  async investigate(request: InvestigationRequest): Promise<InvestigationResult> {
+    return {
+      investigationId: request.investigationId,
+      findings: getFindingsForInvestigation(request.investigationId),
+    };
+  }
 }

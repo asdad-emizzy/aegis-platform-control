@@ -28,9 +28,9 @@ Slice 7 requires representing the operational information an Investigation exami
 
 * `Observation` — owned by **Observability**. An Observation is telemetry-derived operational visibility (dashboards, alerts, health) produced by consuming Telemetry Providers.
 * `Evidence` — owned by the future **AI Investigation** domain, alongside `Investigation`, `Root Cause`, and `AI Recommendation`.
-* `Finding` — owned by **Investigation**. A Finding is an investigative conclusion supported by Evidence. Recommendations consumes Findings to produce proposed operational decisions.
+* `Finding` — owned by **Recommendations**, not Investigation. A Finding is a conclusion produced by the Recommendation Engine after analyzing Observations.
 
-The canonical domain model answers the "what is Evidence in Aegis?" question raised by Slice 7: Evidence belongs to Investigation, is distinct from Observability's Observation, and is distinct from Investigation's Finding.
+This existing ownership matrix (`DOMAIN_MODEL.md` §8) already answers the "what is Evidence in Aegis?" question raised by Slice 7: Evidence belongs to Investigation, is distinct from Observability's Observation, and is distinct from Recommendations' Finding.
 
 ---
 
@@ -40,7 +40,7 @@ Without an explicit record, future contributors (human or AI) could:
 
 * Collapse `Evidence` into `Observation`, incorrectly making Investigation depend on/duplicate Observability's model.
 * Prematurely couple `Evidence` to a specific telemetry or AI provider (e.g. a Prometheus query shape or a HolmesGPT payload).
-* Implement `Recommendation` inside the Investigation boundary, violating the Recommendations domain's ownership of `Recommendation`.
+* Implement `Finding`/`Recommendation` inside the Investigation boundary, violating the Recommendations domain's ownership of `Finding`.
 
 An explicit decision is required before introducing `Evidence` into code.
 
@@ -57,7 +57,7 @@ Investigation
    ↓
 Investigation Context (Evidence[])
    ↓
-Finding            (future — owned by Investigation, not implemented here)
+Finding            (future — owned by Recommendations, not implemented here)
    ↓
 Recommendation      (future — not implemented here)
    ↓
@@ -70,7 +70,7 @@ Verification        (future — not implemented here)
 
 1. **Evidence belongs to the Investigation boundary**, not to Observability. Evidence is *referenced/curated within* an Investigation; it is not a replacement for Observability's `Observation`, which remains the canonical telemetry-derived visibility owned by the Observability domain.
 2. **Evidence is a raw/contextual operational signal**, not a conclusion. It never contains an interpretation, root cause, or recommended action.
-3. **Finding and Recommendation remain out of scope** for Investigation and are not implemented in this slice. When implemented, they remain owned by the Investigation domain. Recommendations may consume Findings and supporting context as an input.
+3. **Finding and Recommendation remain out of scope** for Investigation and are not implemented in this slice. When implemented, they remain owned by the Recommendations domain per the existing Ownership Matrix, and may consume Evidence as an input, mirroring how Recommendations already consumes Observations.
 4. **Evidence is provider-independent.** The shape of Evidence must describe *what kind of operational signal it represents* (e.g. `metric`, `log`, `event`, `config`, `note`) and carry a plain-text `detail`, without embedding provider-specific payloads (no raw PromQL results, no CloudWatch response shapes, no HolmesGPT tool-call output). Provider adapters, when introduced, are responsible for translating provider data into this shape — that translation is out of scope for this slice.
 5. **Investigation Context is 1:many with Evidence**, referenced by `investigationId`, mirroring how `Investigation` already references `Incident` via `incidentId` (Slice 6). Evidence never duplicates Investigation or Incident identity fields.
 6. **This slice is read-only and mock-data driven.** No telemetry provider, AI provider, or backend integration is implemented. No Finding or Recommendation is implemented.
@@ -115,7 +115,7 @@ Decision: Rejected.
 
 ### Disadvantages
 
-* Violates the Investigation boundary by collapsing an investigative conclusion into a proposed decision.
+* Violates `DOMAIN_MODEL.md` Ownership Matrix (`Finding` → Recommendations).
 * Mixes raw operational signal with conclusions, making future audit/explainability harder.
 
 Decision: Rejected.
@@ -141,7 +141,7 @@ Decision: Rejected.
 * Preserves domain ownership boundaries already defined in `DOMAIN_MODEL.md`.
 * Keeps Investigation provider-independent, consistent with Slice 6.
 * Establishes a clear, minimal seam (`kind` + `summary`/`detail`) for future provider adapters to populate without redesign.
-* Keeps Finding/Recommendation entirely out of this slice, avoiding scope creep into future implementation of the Investigation and Recommendations capabilities.
+* Keeps Finding/Recommendation entirely out of this slice, avoiding scope creep into the Recommendations domain.
 
 ## Trade-offs
 

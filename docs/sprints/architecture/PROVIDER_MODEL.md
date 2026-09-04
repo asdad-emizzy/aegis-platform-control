@@ -66,4 +66,4 @@ The Agent Orchestrator may invoke multiple provider contracts during an operatio
 
 ## 6. Implementation Constraint
 
-The concrete TypeScript/API provider interfaces are intentionally deferred to an implementation slice. This checkpoint establishes ownership and dependency direction only.
+Slice 8 implements the Aegis-owned TypeScript `InvestigationProvider` contract and a deterministic mock provider. Concrete external adapters, including HolmesGPT, remain separate future implementations.
